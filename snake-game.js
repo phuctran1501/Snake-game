@@ -162,6 +162,13 @@ function showGameOver() {
             ">Back to Menu</button>
         </div>
     `;
+    const canvasElement = document.getElementById('canvas');
+    const canvasContainer = document.getElementById('game-container');
+    if (canvasElement && canvasContainer) {
+        canvasElement.style.display = 'none';  
+        canvasContainer.style.background = 'black';
+        canvasContainer.style.display = 'block';  
+    }
     clearInterval(gameLoopInterval);
 }
 
