@@ -3,12 +3,15 @@ const canvasContext = canvas.getContext("2d");
 
 let gameOver = false;
 let gameLoopInterval;
-let gameSpeed = document.getElementById('speed'); 
+let gameSpeed = document.getElementById('speed');
 const headImage = new Image();
 headImage.src = "images.jpg";
 
 const bodyImage = new Image();
 bodyImage.src = "images2.jpg";
+
+// Biến lưu trữ kỷ lục
+let highScore = 0; 
 
 window.onload = () => {
     showMenu();
@@ -24,12 +27,11 @@ function showMenu() {
                 <button id="speed" onclick="startGame(15)" style="padding: 10px 20px; font-size: 20px; margin: 5px;">Trung Bình</button>
                 <button id="speed" onclick="startGame(25)" style="padding: 10px 20px; font-size: 20px; margin: 5px;">Khó</button>
                 <button id="speed" onclick="startGame(50)" style="padding: 10px 20px; font-size: 20px; margin: 5px;">Asian</button>
-                </div>
+            </div>
         `;
         gameOverElement.style.display = 'block';
     }
-    canvasContainer.style.display = 'none';
-    canvasElement.style.display = 'none';
+    clearInterval(gameLoopInterval);
 }
 
 function startGame(speed) {
@@ -58,7 +60,6 @@ function resetGame() {
 function gameLoop() {
     gameLoopInterval = setInterval(show, 1000 / gameSpeed);
 }
-
 
 function show() {
     update();
@@ -92,10 +93,17 @@ function showGameOver() {
     if (!gameOverElement) return;
     
     gameOverElement.style.display = 'block';
+
+    // Cập nhật kỷ lục nếu cần
+    if (snake.tail.length - 1 > highScore) {
+        highScore = snake.tail.length - 1;
+    }
+
     gameOverElement.innerHTML = `
         <div style="text-align: center;">
             <h1 style="color: red; font-size: 48px;">GAME OVER!</h1>
             <p style="color: white; font-size: 24px;">Score: ${snake.tail.length - 1}</p>
+            <p style="color: white; font-size: 24px;">High Score: ${highScore}</p>
             <button onclick="resetGame()" style="
                 padding: 10px 20px;
                 font-size: 20px;
@@ -104,7 +112,7 @@ function showGameOver() {
                 border-radius: 5px;
                 cursor: pointer;
             ">Play Again</button>
-            <button onclick="showMenu()" style="
+            <button onclick="showMenu()" style=" 
                 padding: 10px 20px;
                 font-size: 20px;
                 background: #FF6347;
@@ -161,7 +169,7 @@ function draw() {
 
     canvasContext.font = "20px Arial";
     canvasContext.fillStyle = "#00FF42";
-    canvasContext.fillText("Score: " + (snake.tail.length - 1), canvas.width - 120, 18);
+    canvasContext.fillText("Score: " + (snake.tail.length - 1), canvas.width - 80, 18);
 
     createCircle(apple.x + apple.size / 2, apple.y + apple.size / 2, apple.size / 2, apple.color);
 }
