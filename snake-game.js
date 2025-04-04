@@ -1,143 +1,168 @@
-const canvas = document.getElementById("canvas")
-const canvasContext = canvas.getContext('2d')
+const canvas = document.getElementById("canvas");
+const canvasContext = canvas.getContext("2d");
+
+// Ảnh đầu rắn
+const headImage = new Image();
+headImage.src = "images.jpg"; // Đường dẫn ảnh đầu rắn
+
+// Ảnh thân rắn
+const bodyImage = new Image();
+bodyImage.src = "images2.jpg"; // Đường dẫn ảnh thân rắn
 
 window.onload = () => {
-    gameLoop()
-}
+    gameLoop();
+};
 
-function gameLoop() {   
-    setInterval(show, 1000/15) 
+function gameLoop() {
+    setInterval(show, 1000 / 15);
 }
 
 function show() {
-    update()
-    draw()
+    update();
+    draw();
 }
 
 function update() {
-    canvasContext.clearRect(0, 0, canvas.width, canvas.height)
-    snake.move()
-    eatApple()
-    checkHitWall()
+    canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+    snake.move();
+    eatApple();
+    checkHitWall();
 }
 
 function eatApple() {
-    if(snake.tail[snake.tail.length - 1].x == apple.x &&
-        snake.tail[snake.tail.length - 1].y == apple.y){
-            snake.tail[snake.tail.length] = {x:apple.x, y: apple.y}
-            apple = new Apple();
-        }
+    let head = snake.tail[snake.tail.length - 1];
+    if (head.x === apple.x && head.y === apple.y) {
+        snake.tail.push({ x: apple.x, y: apple.y });
+        apple = new Apple();
+    }
 }
 
 function checkHitWall() {
-    let headTail = snake.tail[snake.tail.length -1]
+    let headTail = snake.tail[snake.tail.length - 1];
 
-    if (headTail.x == - snake.size) {
-        headTail.x = canvas.width - snake.size
-    } else if (headTail.x == canvas.widh) {
-        headTail.x = 0
-    } else if (headTail.y == - snake.size) {
-        headTail.y = canvas.height - snake.size
-    } else if (headTail.y == canvas.height) {
-        headTail.y = 0 
+    if (headTail.x < 0) {
+        headTail.x = canvas.width - snake.size;
+    } else if (headTail.x >= canvas.width) {
+        headTail.x = 0;
+    }
+
+    if (headTail.y < 0) {
+        headTail.y = canvas.height - snake.size;
+    } else if (headTail.y >= canvas.height) {
+        headTail.y = 0;
     }
 }
 
 function draw() {
-    createRect(0,0,canvas.width, canvas.height, "black")
-    createRect(0,0, canvas.width, canvas.height)
+    createRect(0, 0, canvas.width, canvas.height, "black");
 
-    for (let i = 0; i < snake.tail.length; i++){
-        createRect(snake.tail[i].x + 2.5, snake.tail[i].y + 2.5,
-            snake.size - 1, snake.size - 1, "red")
+    for (let i = 0; i < snake.tail.length; i++) {
+        if (i === snake.tail.length - 1) {
+            // Vẽ đầu rắn bằng hình ảnh
+            canvasContext.drawImage(headImage, snake.tail[i].x, snake.tail[i].y, snake.size, snake.size);
+        } else {
+            // Vẽ thân rắn bằng hình ảnh hoặc bo tròn
+            canvasContext.drawImage(bodyImage, snake.tail[i].x, snake.tail[i].y, snake.size, snake.size);
+        }
     }
 
-    canvasContext.font = "20px Arial"
-    canvasContext.fillStyle = "#00FF42"
-    canvasContext.fillText("Score: " + (snake.tail.length -1),canvas.width - 120, 18)
-    createRect(apple.x, apple.y, apple.size, apple.size, apple.color)
+    // Hiển thị điểm số
+    canvasContext.font = "20px Arial";
+    canvasContext.fillStyle = "#00FF42";
+    canvasContext.fillText("Score: " + (snake.tail.length - 1), canvas.width - 120, 18);
+
+    // Vẽ táo
+    createCircle(apple.x + apple.size / 2, apple.y + apple.size / 2, apple.size / 2, apple.color);
 }
 
-function createRect(x,y,width, height,color) {
-    canvasContext.fillStyle = color
-    canvasContext.fillRect(x, y, width, height)
+function createRect(x, y, width, height, color) {
+    canvasContext.fillStyle = color;
+    canvasContext.fillRect(x, y, width, height);
+}
+
+function createCircle(x, y, radius, color) {
+    canvasContext.fillStyle = color;
+    canvasContext.beginPath();
+    canvasContext.arc(x, y, radius, 0, Math.PI * 2);
+    canvasContext.fill();
 }
 
 window.addEventListener("keydown", (event) => {
     setTimeout(() => {
-        if (event.keyCode == 37 && snake.rotateX != 1) {
-            snake.rotateX = -1
-            snake.rotateY = 0
-        } else if (event.keyCode == 38 && snake.rotateY != 1) {
-            snake.rotateX = 0
-            snake.rotateY = -1
-        } else if (event.keyCode == 39 && snake.rotateX != -1) {
-            snake.rotateX = 1
-            snake.rotateY = 0
-        } else if (event.keyCode == 40 && snake.rotateY != -1) {
-            snake.rotateX = 0
-            snake.rotateY = 1
+        if (event.keyCode === 37 && snake.rotateX !== 1) {
+            snake.rotateX = -1;
+            snake.rotateY = 0;
+        } else if (event.keyCode === 38 && snake.rotateY !== 1) {
+            snake.rotateX = 0;
+            snake.rotateY = -1;
+        } else if (event.keyCode === 39 && snake.rotateX !== -1) {
+            snake.rotateX = 1;
+            snake.rotateY = 0;
+        } else if (event.keyCode === 40 && snake.rotateY !== -1) {
+            snake.rotateX = 0;
+            snake.rotateY = 1;
         }
-    }, 1)
-})
+    }, 1);
+});
 
 class Snake {
     constructor(x, y, size) {
-        this.x = x
-        this.y = y
-        this.size = size
-        this.tail = [{x:this.x, y:this.y}]
-        this.rotateX = 0
-        this.rotateY = 1
+        this.x = x;
+        this.y = y;
+        this.size = size;
+        this.tail = [{ x: this.x, y: this.y }];
+        this.rotateX = 0;
+        this.rotateY = 1;
     }
 
     move() {
-        let newRect
+        let newRect;
 
-        if (this.rotateX == 1) {
+        if (this.rotateX === 1) {
             newRect = {
                 x: this.tail[this.tail.length - 1].x + this.size,
-                y: this.tail[this.tail.length - 1].y
-            }
-        } else if (this.rotateX == -1) {
+                y: this.tail[this.tail.length - 1].y,
+            };
+        } else if (this.rotateX === -1) {
             newRect = {
                 x: this.tail[this.tail.length - 1].x - this.size,
-                y: this.tail[this.tail.length - 1].y
-            }
-        } else if (this.rotateY == 1) {
+                y: this.tail[this.tail.length - 1].y,
+            };
+        } else if (this.rotateY === 1) {
             newRect = {
                 x: this.tail[this.tail.length - 1].x,
-                y: this.tail[this.tail.length - 1].y + this.size
-            }
-        } else if (this.rotateY == -1) {
+                y: this.tail[this.tail.length - 1].y + this.size,
+            };
+        } else if (this.rotateY === -1) {
             newRect = {
                 x: this.tail[this.tail.length - 1].x,
-                y: this.tail[this.tail.length - 1].y - this.size
-            }
+                y: this.tail[this.tail.length - 1].y - this.size,
+            };
         }
 
-        this.tail.shift()
-        this.tail.push(newRect)
+        this.tail.shift();
+        this.tail.push(newRect);
     }
 }
 
-class Apple{
-    constructor(){
-        let isTouching
-        
+class Apple {
+    constructor() {
+        let isTouching;
+
         while (true) {
             isTouching = false;
-            this.x = Math.floor(Math.random() * canvas.width / snake.size) * snake.size
-            this.y = Math.floor(Math.random() * canvas.height / snake.size) * snake.size
-            
+            this.x = Math.floor(Math.random() * (canvas.width / snake.size)) * snake.size;
+            this.y = Math.floor(Math.random() * (canvas.height / snake.size)) * snake.size;
+
             for (let i = 0; i < snake.tail.length; i++) {
-                if (this.x == snake.tail[i].x && this.y == snake.tail[i].y) {
-                    isTouching = true
+                if (this.x === snake.tail[i].x && this.y === snake.tail[i].y) {
+                    isTouching = true;
+                    break;
                 }
             }
 
-            this.size = snake.size
-            this.color = "green"
+            this.size = snake.size;
+            this.color = "red";
 
             if (!isTouching) {
                 break;
@@ -146,5 +171,5 @@ class Apple{
     }
 }
 
-const snake = new Snake(20,20,20);
+const snake = new Snake(20, 20, 20);
 let apple = new Apple();
