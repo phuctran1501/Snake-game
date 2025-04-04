@@ -129,7 +129,7 @@ function eatApple() {
 
 function checkHitWall() {
     let headTail = snake.tail[snake.tail.length - 1];
-    if (gameSpeed == 50) {
+    if (gameSpeed == 50 || gameSpeed == 25) {
         if (headTail.x < 0 || headTail.x >= canvas.width || headTail.y < 0 || headTail.y >= canvas.height) {
             gameOver = true;
             showGameOver();
