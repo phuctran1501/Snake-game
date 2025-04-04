@@ -10,7 +10,6 @@ headImage.src = "images.jpg";
 const bodyImage = new Image();
 bodyImage.src = "images2.jpg";
 
-// Biến lưu trữ kỷ lục
 let highScore = 0; 
 
 window.onload = () => {
@@ -30,6 +29,17 @@ function showMenu() {
             </div>
         `;
         gameOverElement.style.display = 'block';
+    }
+    const backToMenuButton = document.getElementById('backToMenu');
+    if (backToMenuButton) {
+        backToMenuButton.style.display = 'none';
+    }
+    const canvasElement = document.getElementById('canvas');
+    const canvasContainer = document.getElementById('game-container');
+    if (canvasElement && canvasContainer) {
+        canvasElement.style.display = 'none';  
+        canvasContainer.style.background = 'black';
+        canvasContainer.style.display = 'block';  
     }
     clearInterval(gameLoopInterval);
 }
@@ -54,6 +64,11 @@ function resetGame() {
     const canvasElement = document.getElementById('canvas');
     canvasContainer.style.display = 'block';
     canvasElement.style.display = 'block';
+    const backToMenuButton = document.getElementById('backToMenu');
+    if (backToMenuButton) {
+        backToMenuButton.style.display = 'block';
+    }
+
     gameLoop();
 }
 
@@ -123,7 +138,6 @@ function showGameOver() {
             ">Back to Menu</button>
         </div>
     `;
-    
     clearInterval(gameLoopInterval);
 }
 
