@@ -169,6 +169,10 @@ function showGameOver() {
         canvasContainer.style.background = 'black';
         canvasContainer.style.display = 'block';  
     }
+    const backToMenuButton = document.getElementById('backToMenu');
+    if (backToMenuButton) {
+        backToMenuButton.style.display = 'none';
+    }
     clearInterval(gameLoopInterval);
 }
 
