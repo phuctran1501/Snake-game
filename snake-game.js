@@ -3,36 +3,31 @@ const canvasContext = canvas.getContext("2d");
 
 let gameOver = false;
 let gameLoopInterval;
-let gameSpeed = document.getElementById('speed');
+let gameSpeed = 10;  // Mặc định chế độ dễ
+let gameMode = "oneApple"; // Mặc định là chế độ một táo
 const headImage = new Image();
 headImage.src = "images.jpg";
 
 const bodyImage = new Image();
 bodyImage.src = "images2.jpg";
 
-let highScore = 0; 
+let highScore = 0;
 
 window.onload = () => {
-    showMenu();
+    showInitialMenu();
 };
 
-function showMenu() {
+function showInitialMenu() {
     const gameOverElement = document.getElementById('gameOverText');
     if (gameOverElement) {
         gameOverElement.innerHTML = `
             <div style="text-align: center;">
-                <h1 style="color: white; font-size: 36px;">Chọn Chế Độ</h1>
-                <button id="speed" onclick="startGame(10)" style="padding: 10px 20px; font-size: 20px; margin: 5px;">Dễ</button>
-                <button id="speed" onclick="startGame(15)" style="padding: 10px 20px; font-size: 20px; margin: 5px;">Trung Bình</button>
-                <button id="speed" onclick="startGame(25)" style="padding: 10px 20px; font-size: 20px; margin: 5px;">Khó</button>
-                <button id="speed" onclick="startGame(50)" style="padding: 10px 20px; font-size: 20px; margin: 5px;">Asian</button>
+                <h1 style="color: white; font-size: 40px;">Chọn Chế Độ Táo</h1>
+                <button onclick="selectGameMode('oneApple')" style="padding: 10px 20px; font-size: 20px; margin: 5px;">Một Táo</button>
+                <button onclick="selectGameMode('multipleApples')" style="padding: 10px 20px; font-size: 20px; margin: 5px;">Nhiều Táo</button>
             </div>
         `;
         gameOverElement.style.display = 'block';
-    }
-    const backToMenuButton = document.getElementById('backToMenu');
-    if (backToMenuButton) {
-        backToMenuButton.style.display = 'none';
     }
     const canvasElement = document.getElementById('canvas');
     const canvasContainer = document.getElementById('game-container');
@@ -40,6 +35,36 @@ function showMenu() {
         canvasElement.style.display = 'none';  
         canvasContainer.style.background = 'black';
         canvasContainer.style.display = 'block';  
+    }
+    const backToMenuButton = document.getElementById('backToMenu');
+    if (backToMenuButton) {
+        backToMenuButton.style.display = 'none';
+    }
+    clearInterval(gameLoopInterval);
+}
+
+function selectGameMode(mode) {
+    gameMode = mode;
+    showDifficultyMenu(); // Sau khi chọn chế độ táo, hiển thị menu chọn mức độ
+}
+
+function showDifficultyMenu() {
+    const gameOverElement = document.getElementById('gameOverText');
+    if (gameOverElement) {
+        gameOverElement.innerHTML = `
+            <div style="text-align: center;">
+                <h1 style="color: white; font-size: 40px;">Chọn Mức Độ</h1>
+                <button onclick="startGame(10)" style="padding: 10px 20px; font-size: 20px; margin: 5px;">Dễ</button>
+                <button onclick="startGame(15)" style="padding: 10px 20px; font-size: 20px; margin: 5px;">Trung Bình</button>
+                <button onclick="startGame(25)" style="padding: 10px 20px; font-size: 20px; margin: 5px;">Khó</button>
+                <button onclick="startGame(50)" style="padding: 10px 20px; font-size: 20px; margin: 5px;">Asian</button>
+            </div>
+        `;
+        gameOverElement.style.display = 'block';
+    }
+    const backToMenuButton = document.getElementById('backToMenu');
+    if (backToMenuButton) {
+        backToMenuButton.style.display = 'none';
     }
     clearInterval(gameLoopInterval);
 }
@@ -55,7 +80,7 @@ function resetGame() {
     }
     gameOver = false;
     snake = new Snake(20, 20, 20);
-    apple = new Apple();
+    apple = gameMode === "multipleApples" ? new MultipleApples() : new Apple();
     const gameOverElement = document.getElementById('gameOverText');
     if (gameOverElement) {
         gameOverElement.style.display = 'none';
@@ -68,7 +93,6 @@ function resetGame() {
     if (backToMenuButton) {
         backToMenuButton.style.display = 'block';
     }
-
     gameLoop();
 }
 
@@ -127,7 +151,7 @@ function showGameOver() {
                 border-radius: 5px;
                 cursor: pointer;
             ">Play Again</button>
-            <button onclick="showMenu()" style=" 
+            <button onclick="showInitialMenu()" style=" 
                 padding: 10px 20px;
                 font-size: 20px;
                 background: #FF6347;
@@ -143,9 +167,21 @@ function showGameOver() {
 
 function eatApple() {
     let head = snake.tail[snake.tail.length - 1];
-    if (head.x === apple.x && head.y === apple.y) {
-        snake.tail.push({ x: apple.x, y: apple.y });
-        apple = new Apple();
+    
+    if (apple instanceof MultipleApples) {
+        for (let i = 0; i < apple.apples.length; i++) {
+            if (head.x === apple.apples[i].x && head.y === apple.apples[i].y) {
+                snake.tail.push({ x: apple.apples[i].x, y: apple.apples[i].y });
+                apple.apples.splice(i, 1);  
+                apple.apples.push(new Apple());  
+                break;
+            }
+        }
+    } else {
+        if (head.x === apple.x && head.y === apple.y) {
+            snake.tail.push({ x: apple.x, y: apple.y });
+            apple = new Apple();
+        }
     }
 }
 
@@ -183,9 +219,14 @@ function draw() {
 
     canvasContext.font = "20px Arial";
     canvasContext.fillStyle = "#00FF42";
-    canvasContext.fillText("Score: " + (snake.tail.length - 1), canvas.width - 80, 18);
-
-    createCircle(apple.x + apple.size / 2, apple.y + apple.size / 2, apple.size / 2, apple.color);
+    canvasContext.fillText("Score: " + (snake.tail.length - 1), canvas.width - 100, 18);
+    if (apple instanceof MultipleApples) {
+        for (let i = 0; i < apple.apples.length; i++) {
+            createCircle(apple.apples[i].x + apple.apples[i].size / 2, apple.apples[i].y + apple.apples[i].size / 2, apple.apples[i].size / 2, apple.apples[i].color);
+        }
+    } else {
+        createCircle(apple.x + apple.size / 2, apple.y + apple.size / 2, apple.size / 2, apple.color);
+    }
 }
 
 function createRect(x, y, width, height, color) {
@@ -283,6 +324,28 @@ class Apple {
                 break;
             }
         }
+    }
+}
+
+class MultipleApples {
+    constructor() {
+        this.apples = [];
+        for (let i = 0; i < 4; i++) {
+            let newApple;
+            do {
+                newApple = new Apple();
+            } while (this.isTouchingSnake(newApple));
+            this.apples.push(newApple);
+        }
+    }
+
+    isTouchingSnake(apple) {
+        for (let i = 0; i < snake.tail.length; i++) {
+            if (apple.x === snake.tail[i].x && apple.y === snake.tail[i].y) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 
