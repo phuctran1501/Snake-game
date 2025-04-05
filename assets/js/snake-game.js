@@ -173,7 +173,6 @@ function eatApple() {
 
 function checkCollisionWithBody() {
     let head = snake.tail[snake.tail.length - 1];
-    if (gameSpeed != 5){
         for (let i = 0; i < snake.tail.length - 1; i++) {
             if (head.x === snake.tail[i].x && head.y === snake.tail[i].y) {
                 gameOver = true;
@@ -181,7 +180,6 @@ function checkCollisionWithBody() {
                 return;
             }
         }
-    }
 }
 
 function showGameOver() {
