@@ -3,7 +3,7 @@ const canvasContext = canvas.getContext("2d");
 
 let gameOver = false;
 let gameLoopInterval;
-let gameSpeed = 10;  // Mặc định chế độ dễ
+let gameSpeed = 5;  // Mặc định chế độ dễ
 let gameMode = "oneApple"; // Mặc định là chế độ một táo
 const headImage = new Image();
 headImage.src = "./assets/img/images.jpg";
@@ -54,10 +54,10 @@ function showDifficultyMenu() {
         gameOverElement.innerHTML = `
             <div style="text-align: center;">
                 <h1 style="color: white; font-size: 40px;">Chọn Mức Độ</h1>
-                <button onclick="startGame(10)" style="padding: 10px 20px; font-size: 20px; margin: 5px;">Dễ</button>
-                <button onclick="startGame(15)" style="padding: 10px 20px; font-size: 20px; margin: 5px;">Trung Bình</button>
-                <button onclick="startGame(25)" style="padding: 10px 20px; font-size: 20px; margin: 5px;">Khó</button>
-                <button onclick="startGame(50)" style="padding: 10px 20px; font-size: 20px; margin: 5px;">Asian</button>
+                <button onclick="startGame(5)" style="padding: 10px 20px; font-size: 20px; margin: 5px;">Dễ</button>
+                <button onclick="startGame(10)" style="padding: 10px 20px; font-size: 20px; margin: 5px;">Trung Bình</button>
+                <button onclick="startGame(20)" style="padding: 10px 20px; font-size: 20px; margin: 5px;">Khó</button>
+                <button onclick="startGame(40)" style="padding: 10px 20px; font-size: 20px; margin: 5px;">Asian</button>
             </div>
         `;
         gameOverElement.style.display = 'block';
@@ -227,7 +227,7 @@ function showGameOver() {
 
 function checkHitWall() {
     let headTail = snake.tail[snake.tail.length - 1];
-    if (gameSpeed == 50 || gameSpeed == 25) {
+    if (gameSpeed == 40 || gameSpeed == 20) {
         if (headTail.x < 0 || headTail.x >= canvas.width || headTail.y < 0 || headTail.y >= canvas.height) {
             gameOver = true;
             showGameOver();
