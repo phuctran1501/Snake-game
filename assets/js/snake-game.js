@@ -173,6 +173,10 @@ function eatApple() {
 
 function checkCollisionWithBody() {
     let head = snake.tail[snake.tail.length - 1];
+    if (snake.tail.length <= 4) {
+        return; 
+    }
+    else {
         for (let i = 0; i < snake.tail.length - 1; i++) {
             if (head.x === snake.tail[i].x && head.y === snake.tail[i].y) {
                 gameOver = true;
@@ -180,6 +184,7 @@ function checkCollisionWithBody() {
                 return;
             }
         }
+    }
 }
 
 function showGameOver() {
@@ -287,26 +292,34 @@ function createCircle(x, y, radius, color) {
 
 window.addEventListener("keydown", (event) => {
     if (gameOver) return;
-    
     setTimeout(() => {
-        if (event.keyCode === 37 && snake.rotateX !== 1) {
-            snake.rotateX = -1;
-            snake.rotateY = 0;
+        if (event.keyCode === 37 && snake.rotateX !== 1) {  
+            if (snake.rotateX !== -1) {
+                snake.rotateX = -1;
+                snake.rotateY = 0;
+            }
         }
-        if (event.keyCode === 38 && snake.rotateY !== 1) {
-            snake.rotateX = 0;
-            snake.rotateY = -1;
+        if (event.keyCode === 38 && snake.rotateY !== 1) {  
+            if (snake.rotateY !== -1) {
+                snake.rotateX = 0;
+                snake.rotateY = -1;
+            }
         }
-        if (event.keyCode === 39 && snake.rotateX !== -1) {
-            snake.rotateX = 1;
-            snake.rotateY = 0;
+        if (event.keyCode === 39 && snake.rotateX !== -1) {  
+            if (snake.rotateX !== 1) {
+                snake.rotateX = 1;
+                snake.rotateY = 0;
+            }
         }
-        if (event.keyCode === 40 && snake.rotateY !== -1) {
-            snake.rotateX = 0;
-            snake.rotateY = 1;
+        if (event.keyCode === 40 && snake.rotateY !== -1) {  
+            if (snake.rotateY !== 1) {
+                snake.rotateX = 0;
+                snake.rotateY = 1;
+            }
         }
-    }, 1);
+    }, 5);  
 });
+
 
 class Snake {
     constructor(x, y, size) {
